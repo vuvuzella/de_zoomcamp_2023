@@ -1,0 +1,35 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: de_zoomcamp_db
+    image: postgres:14.6
+    restart: always
+    environment:
+      POSTGRES_USER: de_zoomcamp
+      POSTGRES_PASSWORD: de_zoomcamp
+      POSTGRES_DB: de_zoomcamp
+    ports:
+      - 5433:5432
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+  de_pipeline:
+    image: de_pipeline:latest
+    build: ./
+    environment:
+      - DB_PORT=5432
+      - DB_HOST=db
+    ports:
+      - 5000:5000
+    volumes:
+      - ./src:/code
+    depends_on:
+      - "db"
+
+volumes:
+  db_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/persistent_store/db_volume
