@@ -13,11 +13,17 @@ services:
       - 5433:5432
     volumes:
       - db_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "de_zoomcamp" ]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
   de_pipeline:
     image: de_pipeline:latest
     build: ./
     environment:
-      - DB_PORT=5432
+      - DB_PORT=5433
       - DB_HOST=db
     ports:
       - 5000:5000
