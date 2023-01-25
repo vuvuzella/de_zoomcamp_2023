@@ -21,16 +21,20 @@ services:
       start_period: 30s
   de_pipeline:
     image: de_pipeline:latest
-    build: ./
+    # https://stackoverflow.com/questions/27068596/how-to-include-files-outside-of-dockers-build-context
+    build:
+      context: ./
+      dockerfile: ./pipeline/Dockerfile
     environment:
       - DB_PORT=5433
       - DB_HOST=db
     ports:
       - 5000:5000
     volumes:
-      - ./src:/code
+      - ./pipeline:/code
     depends_on:
       - "db"
+    command: [ "poetry", "run", "python", "main.py" ]
 
 volumes:
   db_volume:
