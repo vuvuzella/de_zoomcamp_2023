@@ -26,8 +26,11 @@ services:
       context: ./
       dockerfile: ./pipeline/Dockerfile
     environment:
-      - DB_PORT=5433
-      - DB_HOST=db
+      - DB_PORT=5432 # This reference the real port because both service are in the same default docker network
+      - DB_HOST=db # This references the hostname of the database service in this compose file
+      - DB_USERNAME=de_zoomcamp
+      - DB_PASSWORD=de_zoomcamp
+      - DB_NAME=de_zoomcamp
     ports:
       - 5000:5000
     volumes:
