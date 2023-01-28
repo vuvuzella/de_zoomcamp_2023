@@ -101,9 +101,6 @@ class Pipeline(ABC):
         # chunkify the csv, because reading the whole data into memory is costly
         df = pd.read_csv(self.source, iterator=False, nrows=100)
 
-        # POSTGRES-specific DDL for the CSV
-        print(pd.io.sql.get_schema(df, self.dest_db, con=self.engine))
-
         # We want to separate the creation of the table and the insertion of the rows
         # To do this, we first get the first chunk and get the first row,
         # generate the DDL SQL to create the table and execute it to propagate
@@ -112,12 +109,21 @@ class Pipeline(ABC):
         chunk_size = 10000
         df_iter = pd.read_csv(self.source, iterator=True, chunksize=chunk_size)
         first_chunk = next(df_iter)
+        first_chunk = self.data_transform(first_chunk)
 
         # Create the table uisng the first row data of the csv which is the column names for the table
         columns = first_chunk.head(n=0)
+        columns.columns = [column.lower() for column in columns.columns]
+
+        # POSTGRES-specific DDL for the CSV
+        print(pd.io.sql.get_schema(columns, self.dest_db, con=self.engine))
+
         columns.to_sql(name=self.dest_db, con=self.engine, if_exists="replace")
 
         first_chunk_data = first_chunk.tail(n=chunk_size - 1)
+        first_chunk_data.columns = [
+            column.lower() for column in first_chunk_data.columns
+        ]
         first_chunk_data.to_sql(name=self.dest_db, con=self.engine, if_exists="append")
 
         elapsed_time = 0
@@ -128,6 +134,8 @@ class Pipeline(ABC):
             # TODO: This is very specific to our dataset. generalize this
             # chunk.tpep_pickup_datetime = pd.to_datetime(chunk.tpep_pickup_datetime)
             # chunk.tpep_dropoff_datetime = pd.to_datetime(chunk.tpep_dropoff_datetime)
+
+            chunk.columns = [column.lower() for column in columns.columns]
 
             chunk = self.data_transform(chunk)
 
@@ -143,12 +151,22 @@ class Pipeline(ABC):
         print(f"Done ingesting data to database. Elapsed Time is {elapsed_time:.3f}")
 
 
-class TaxiDataPipeline(Pipeline):
+class YellowTaxiDataPipeline(Pipeline):
     def data_transform(self, dataframe: pd.DataFrame):
         # Convert string datetime into pandas datetime
         dataframe.tpep_pickup_datetime = pd.to_datetime(dataframe.tpep_pickup_datetime)
         dataframe.tpep_dropoff_datetime = pd.to_datetime(
             dataframe.tpep_dropoff_datetime
+        )
+        return dataframe
+
+
+class GreenTaxiDataPipeline(Pipeline):
+    def data_transform(self, dataframe: pd.DataFrame):
+        # Convert string datetime into pandas datetime
+        dataframe.lpep_pickup_datetime = pd.to_datetime(dataframe.lpep_pickup_datetime)
+        dataframe.lpep_dropoff_datetime = pd.to_datetime(
+            dataframe.lpep_dropoff_datetime
         )
         return dataframe
 

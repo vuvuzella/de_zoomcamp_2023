@@ -13,6 +13,7 @@ COPY ../pyproject.toml ../
 # datasets to ingest
 ADD https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz files/
 ADD https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv files/
+ADD https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-01.csv.gz files/
 
 RUN python3 -m pip install --user pipx \
     && python3 -m pipx ensurepath \
