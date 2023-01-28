@@ -1,0 +1,1 @@
+This bootstrap folder is used to create the remote state cloud storage infrastructure for the parent terraform. In a clean infrastructure environment, this terraform is applied directly from a developer's machine
