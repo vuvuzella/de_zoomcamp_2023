@@ -13,6 +13,6 @@ terraform {
 }
 
 provider "google" {
-  project = var.project # project id of where the resources will belong to
-  region  = var.region
+  project = local.project_name # project id of where the resources will belong to
+  region  = local.region
 }

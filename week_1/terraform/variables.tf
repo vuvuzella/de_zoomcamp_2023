@@ -1,7 +1,7 @@
 variable "BQ_DATASET" {
   description = "Name of the Datawarehouse to create"
   type        = string
-  default     = "trips_data_all"
+  default     = "de_zoomcamp_wh"
 }
 
 variable "TABLE_NAME" {
