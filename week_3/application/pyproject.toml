@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "de-zoomcamp-week-3"
+version = "0.1.0"
+description = "Data Engineering Zoom Camp Week 3 work files and homework"
+authors = ["vuvuzella <j.tabacii@gmail.com>"]
+readme = "README.md"
+# packages = [{include = "de_zoomcamp_week_3"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^1.5.3"
+jupyter = "^1.0.0"
+sqlalchemy = "^2.0.1"
+psycopg2-binary = "^2.9.5"
+prefect = "2.3.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
