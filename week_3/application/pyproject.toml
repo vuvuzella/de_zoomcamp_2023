@@ -10,9 +10,14 @@ readme = "README.md"
 python = "^3.10"
 pandas = "^1.5.3"
 jupyter = "^1.0.0"
-sqlalchemy = "^2.0.1"
 psycopg2-binary = "^2.9.5"
-prefect = "2.3.2"
+prefect = "2.7.7"
+prefect-gcp = {version = "0.2.4", extras = ["cloud-storage"]}
+prefect-sqlalchemy = "0.2.2"
+pandas-gbq = "^0.19.1"
+protobuf = "^4.21.12"
+sqlalchemy = "1.4.46"
+pyarrow = "10.0.1"
 
 
 [build-system]

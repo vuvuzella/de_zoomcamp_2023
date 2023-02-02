@@ -1,5 +1,11 @@
+import prefect
+from prefect import flow, task
+import sqlalchemy
+
+
 def main():
-    print("This is from main")
+    print(f"Prefect version: {prefect.__version__}")
+    print(f"sqlalchemy version: {sqlalchemy.__version__}")
 
 
 if __name__ == "__main__":
