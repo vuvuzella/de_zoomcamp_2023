@@ -32,4 +32,5 @@ RUN python3 -m pip install --user pipx \
 
 COPY pipeline/*.py ./
 
-CMD ["poetry", "run", "python", "main.py"]
+# Expose ports for prefect dashboard
+EXPOSE 4200
