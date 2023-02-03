@@ -1,0 +1,61 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: de_zoomcamp_db
+    image: postgres:14.6
+    restart: always
+    environment:
+      POSTGRES_USER: de_zoomcamp
+      POSTGRES_PASSWORD: de_zoomcamp
+      POSTGRES_DB: de_zoomcamp
+    ports:
+      - 5433:5432
+    volumes:
+      - ./db_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "de_zoomcamp" ]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  prefect-dashboard:
+    image: de_pipeline/week_2:latest
+    build:
+      context: ./application
+      dockerfile: ./Dockerfile
+    environment:
+      - PREFECT_ORION_API_HOST=0.0.0.0
+    volumes:
+      - ./prefect_dashboard_volume:/root/.prefect
+    ports:
+      - 4200:4200
+    command: [ "poetry", "run", "prefect", "orion", "start" ]
+
+  de_pipeline:
+    image: de_pipeline/week_2:latest
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    environment:
+      - name=value
+    depends_on:
+      - db
+    command: [ "poetry", "run", "python", "main.py" ]
+    # ports:
+    #   - 5000:5000 # TODO: I dont think I'll need this?
+    # volumes:
+    #   - ./application:/code # This does nothing for de_pipeline. Confirm this is not needed anymore
+    # volumes:
+    #   db_volume:
+    #     driver: local
+    #     driver_opts:
+    #       type: none
+    #       o: bind
+    #       device: ${PWD}/persistent_store/db_volume
+    #   prefect_dashboard_volume:
+    #     driver: local
+    #     driver_opts:
+    #       type: none
+    #       o: bind
+    #       device: ${PWD}/persistent_store/prefect_dashboard_volume
