@@ -35,13 +35,13 @@ services:
   de_pipeline:
     image: de_pipeline/week_2:latest
     build:
-      context: ./
+      context: ./application
       dockerfile: ./Dockerfile
     environment:
       - name=value
     depends_on:
       - db
-    command: [ "poetry", "run", "python", "main.py" ]
+    # command: [ "poetry", "run", "python", "main.py" ]
     # ports:
     #   - 5000:5000 # TODO: I dont think I'll need this?
     # volumes:

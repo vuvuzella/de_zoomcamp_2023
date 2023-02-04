@@ -3,3 +3,5 @@ memo_store.toml
 orion.db
 prefect_dashboard_volume
 db_volume
+__pycache__
+.pytest_cache

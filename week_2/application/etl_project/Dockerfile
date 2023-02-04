@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10-slim-buster AS de_pipeline_week_3
 
-WORKDIR /pipeline
+WORKDIR /application
 
 # Optimizations taken from https://github.com/python-poetry/poetry/discussions/1879
 ENV \
@@ -20,17 +20,14 @@ ENV \
     PYTHONBUFFERED=1 \
     PYTHONDONTWRITERBYTECODE=1
 
-# Copy poetry lock and pyproject files in working directory
-COPY poetry.lock ../
-COPY pyproject.toml ../
+# Copy source files to working directory
+COPY poetry.lock pyproject.toml *.py ./
 
 # Install pipx and use pipx to install poetry. Then use poetry to install app dependencies
 RUN python3 -m pip install --user pipx \
     && python3 -m pipx ensurepath \
     && pipx install poetry \
     && poetry install --no-root
-
-COPY pipeline/*.py ./
 
 # Expose ports for prefect dashboard
 EXPOSE 4200
