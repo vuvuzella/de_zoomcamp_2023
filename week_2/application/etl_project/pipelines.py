@@ -18,7 +18,7 @@ from etl_project.config import DBConfig
 
 def get_schema(dataframe: DataFrame, db_name: str, con: Engine | None = None):
     # get_schema is undocumented function https://github.com/pandas-dev/pandas/issues/9960
-    return pd.io.sql.get_schema(dataframe, db_name, con)  # type: ignore
+    return pd.io.sql.get_schema(dataframe, db_name, con=con)  # type: ignore
 
 
 class Pipeline(ABC):
@@ -73,7 +73,7 @@ class Pipeline(ABC):
         for chunk in df_iter:
 
             start_time = time()
-            if not self.engine.dialect.has_table(self.engine, self.dest_table):
+            if not self.engine.has_table(self.dest_table):
                 self.create_table(chunk)
                 self.insert_rows(chunk.tail(chunk.size - 1))
             else:

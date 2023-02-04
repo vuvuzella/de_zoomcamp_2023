@@ -21,6 +21,7 @@ services:
       start_period: 30s
   prefect-dashboard:
     image: de_pipeline/week_2:latest
+    restart: always
     build:
       context: ./application
       dockerfile: ./Dockerfile

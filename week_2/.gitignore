@@ -5,3 +5,5 @@ prefect_dashboard_volume
 db_volume
 __pycache__
 .pytest_cache
+*.csv
+*.csv.gz
