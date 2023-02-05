@@ -12,8 +12,9 @@ from prefect.tasks import task_input_hash
 from datetime import timedelta
 from abc import ABC, abstractmethod
 from os.path import dirname
+from prefect import flow
 
-from etl_project.config import DBConfig
+from config import DBConfig
 
 
 def get_schema(dataframe: DataFrame, db_name: str, con: Engine | None = None):
@@ -35,6 +36,9 @@ class Pipeline(ABC):
             f"postgresql://{config.username}:{config.password}@{config.host}:{config.port}/{config.db_name}"
         )
 
+    def is_table_exist(self) -> bool:
+        return self.engine.has_table(self.dest_table)
+
     def data_transform(self, dataframe: DataFrame) -> DataFrame:
         return dataframe
 
@@ -46,13 +50,11 @@ class Pipeline(ABC):
         open(output_filename, "wb").write(contents)
         return output_filename
 
-    def fetch_chunks(self, file_path: str, chunk_size: int = 1000):
-        df_iter: TextFileReader = pd.read_csv(
-            file_path, iterator=True, chunksize=chunk_size
-        )
+    def fetch_chunks(self, file_path: str, chunk_size: int = 1000) -> TextFileReader:
+        df_iter = pd.read_csv(file_path, iterator=True, chunksize=chunk_size)
         return df_iter
 
-    def create_table(self, dataframe: DataFrame):
+    def create_table(self, dataframe: DataFrame) -> int | None:
         columns = dataframe.head(n=0)
         columns.columns = [str(column).lower() for column in columns.columns]
         # POSTGRES-specific DDL for the CSV
@@ -62,12 +64,10 @@ class Pipeline(ABC):
         )
 
     def insert_rows(self, chunk: DataFrame) -> int | None:
-        chunk = self.data_transform(chunk)
+        # chunk = self.data_transform(chunk)
         chunk.to_sql(name=self.dest_table, con=self.engine, if_exists="append")
 
-    def ingest(self, filepath) -> None:
-
-        df_iter = self.fetch_chunks(filepath, 1000)
+    def ingest(self, df_iter: TextFileReader) -> None:
 
         elapsed_time = 0
         for chunk in df_iter:

@@ -1,11 +1,14 @@
 from prefect import flow
-from etl_project.tasks import extract_data, ingest_data
-from etl_project.pipelines import YellowTaxiDataPipeline
-from etl_project.config import DBConfig
+from tasks import extract_data, insert_data, fetch_chunks, transform_data, create_table
+from pipelines import YellowTaxiDataPipeline
+from config import DBConfig
 from argparse import Namespace
+from time import time
+import os
+import pandas as pd
 
 
-@flow(name="Yellow Taxi Data ETL")
+@flow(name="Yellow Taxi Data ETL", log_prints=True)
 def yellow_taxi_etl_flow():
     db_config = DBConfig(
         Namespace(
@@ -21,6 +24,35 @@ def yellow_taxi_etl_flow():
         source=url, dest_table_name="yellow_taxi_data", config=db_config
     )
 
-    filepath = extract_data(yellow_taxi_pipeline)
+    # filepath = extract_data(yellow_taxi_pipeline)
+    filepath = f"{os.path.dirname(__file__)}/yellow_tripdata_2021-01.csv.gz"
 
-    ingest_data(yellow_taxi_pipeline, filepath)
+    df_iter = yellow_taxi_pipeline.fetch_chunks(filepath)
+
+    elapsed_time = 0
+
+    for chunk in df_iter:
+
+        start_time = time()
+        # transform data
+        processed_data = transform_data(yellow_taxi_pipeline, chunk)
+
+        if not yellow_taxi_pipeline.is_table_exist():
+            # create table
+            create_table(yellow_taxi_pipeline, processed_data)
+            # insert data n-1
+            insert_data(
+                yellow_taxi_pipeline, processed_data.tail(n=processed_data.size - 1)
+            )
+        else:
+            # transform all data
+            insert_data(yellow_taxi_pipeline, processed_data)
+
+        end_time = time()
+
+        time_to_insert = end_time - start_time
+        elapsed_time = elapsed_time + time_to_insert
+
+        print(f"inserted chunk, took {(time_to_insert):.3f} seconds")
+
+    print(f"Done ingesting data to database. Elapsed Time is {elapsed_time:.3f}")
