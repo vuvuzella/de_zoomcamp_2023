@@ -1,11 +1,23 @@
 from prefect import flow
-from tasks import extract_data, insert_data, fetch_chunks, transform_data, create_table
+from tasks import (
+    extract_data,
+    insert_data,
+    fetch_chunks,
+    transform_data,
+    create_table,
+    fetch,
+    clean,
+    write_parquet_file,
+    write_to_gcs,
+)
 from pipelines import YellowTaxiDataPipeline
 from config import DBConfig
 from argparse import Namespace
 from time import time
 import os
 import pandas as pd
+
+from prefect_gcp.cloud_storage import GcsBucket
 
 
 @flow(name="Yellow Taxi Data ETL", log_prints=True)
@@ -24,8 +36,13 @@ def yellow_taxi_etl_flow():
         source=url, dest_table_name="yellow_taxi_data", config=db_config
     )
 
-    # filepath = extract_data(yellow_taxi_pipeline)
     filepath = f"{os.path.dirname(__file__)}/yellow_tripdata_2021-01.csv.gz"
+    if os.path.exists(filepath):
+        # do nothing
+        ...
+    else:
+        # fetch data
+        filepath = extract_data(yellow_taxi_pipeline)
 
     df_iter = yellow_taxi_pipeline.fetch_chunks(filepath)
 
@@ -56,3 +73,17 @@ def yellow_taxi_etl_flow():
         print(f"inserted chunk, took {(time_to_insert):.3f} seconds")
 
     print(f"Done ingesting data to database. Elapsed Time is {elapsed_time:.3f}")
+
+
+@flow(name="ETL Web To GCP", log_prints=True)
+def etl_web_to_gcs() -> None:
+    color = "yellow"
+    year = 2021
+    month = 1
+    dataset_file = f"{color}_tripdata_{year}-{month:02}"
+    dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
+
+    df = fetch(dataset_url)
+    clean_df = clean(df)
+    path = write_parquet_file(clean_df, dataset_file)
+    write_to_gcs(str(path), str(path))
