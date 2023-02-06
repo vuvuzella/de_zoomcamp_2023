@@ -75,9 +75,20 @@ def fetch(url: str) -> DataFrame:
 def clean(df: DataFrame) -> DataFrame:
     # Make columns lowercase
     df.columns = [str(column).lower() for column in df.columns]
+
     # Convert string datetime into pandas datetime
-    df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-    df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+    if "tpep_pickup_datetime" in df.columns:
+        df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
+
+    if "tpep_dropoff_datetime" in df.columns:
+        df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+
+    if "lpep_pickup_datetime" in df.columns:
+        df.lpep_pickup_datetime = pd.to_datetime(df.lpep_pickup_datetime)
+
+    if "lpep_dropoff_datetime" in df.columns:
+        df.lpep_dropoff_datetime = pd.to_datetime(df.lpep_dropoff_datetime)
+
     # Filter data of trips that has zero passengers
     # df = df[df["passenger_count"] != 0]
 
@@ -121,21 +132,22 @@ def create_schema_json(df: DataFrame, color: str, year: int, month: int):
 @task(log_prints=True)
 def transform_gcs_data(path: pathlib.Path) -> DataFrame:
     df = pd.read_parquet(path)
-    print(
-        f"before replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
-    )
-    df["passenger_count"].fillna(0, inplace=True)  # replace 0 values with NA
-    print(
-        f"after after replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
-    )
+    print(f"*************** {df.shape[0]} ")
+    # print(
+    #     f"before replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
+    # )
+    # df["passenger_count"].fillna(0, inplace=True)  # replace 0 values with NA
+    # print(
+    #     f"after after replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
+    # )
     return df
 
 
 @task
-def upload_to_bq(df: DataFrame) -> None:
+def upload_to_bq(df: DataFrame, color: str) -> None:
     gcp_credentials_block = GcpCredentials.load("service-account-cred")
     df.to_gbq(
-        destination_table="de_zoomcamp_dataset.yellow_taxi_data",
+        destination_table=f"de_zoomcamp_dataset.{color}_taxi_data",
         project_id="de-zoomcamp-376020",
         credentials=gcp_credentials_block.get_credentials_from_service_account(),  # type: ignore
         chunksize=10_000,

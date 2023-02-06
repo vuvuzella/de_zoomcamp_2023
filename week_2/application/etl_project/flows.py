@@ -85,6 +85,7 @@ def etl_web_to_gcs(year: int, month: int, color: str) -> None:
     dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
 
     df = fetch(dataset_url)
+    print(f"size: {df.shape[0]}")
     clean_df = clean(df)
     create_schema_json(clean_df, color, year, month)
     path = write_parquet_file(clean_df, dataset_file)
@@ -101,7 +102,7 @@ def etl_gcp_to_BigQuery(year: int, month: int, color: str) -> None:
 
     local_path = extract_from_gcs(gcp_path)
     df = transform_gcs_data(local_path)
-    upload_to_bq(df)
+    upload_to_bq(df, color)
 
 
 @flow()
@@ -110,3 +111,6 @@ def etl_parent_flow(
 ):
     for month in months:
         etl_web_to_gcs(month=month, year=year, color=color)
+
+    for month in months:
+        etl_gcp_to_BigQuery(month=month, year=year, color=color)
