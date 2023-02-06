@@ -9,6 +9,10 @@ from tasks import (
     clean,
     write_parquet_file,
     write_to_gcs,
+    extract_from_gcs,
+    transform_gcs_data,
+    upload_to_bq,
+    create_schema_json,
 )
 from pipelines import YellowTaxiDataPipeline
 from config import DBConfig
@@ -85,5 +89,23 @@ def etl_web_to_gcs() -> None:
 
     df = fetch(dataset_url)
     clean_df = clean(df)
+    create_schema_json(clean_df)
     path = write_parquet_file(clean_df, dataset_file)
     write_to_gcs(str(path), str(path))
+
+
+@flow(name="ETL GCP to BigQuery", log_prints=True)
+def etl_gcp_to_BigQuery():
+    # Get from bigquery
+    # Make additional transformations
+    # Upload to Google BigQuery
+    color = "yellow"
+    month = 1
+    year = 2021
+    filename = f"{color}_tripdata_{year}-{month:02}.parquet"
+    gcp_path = f"data/{filename}"
+
+    local_path = extract_from_gcs(gcp_path)
+    what = str(local_path)
+    df = transform_gcs_data(local_path)
+    upload_to_bq(df)

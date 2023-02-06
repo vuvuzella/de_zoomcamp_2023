@@ -1,0 +1,78 @@
+[
+    {
+        "name": "index",
+        "type": "FLOAT"
+    },
+    {
+        "name": "vendorid",
+        "type": "FLOAT"
+    },
+    {
+        "name": "tpep_pickup_datetime",
+        "type": "DATETIME"
+    },
+    {
+        "name": "tpep_dropoff_datetime",
+        "type": "DATETIME"
+    },
+    {
+        "name": "passenger_count",
+        "type": "FLOAT"
+    },
+    {
+        "name": "trip_distance",
+        "type": "FLOAT"
+    },
+    {
+        "name": "ratecodeid",
+        "type": "FLOAT"
+    },
+    {
+        "name": "store_and_fwd_flag",
+        "type": "STRING"
+    },
+    {
+        "name": "pulocationid",
+        "type": "FLOAT"
+    },
+    {
+        "name": "dolocationid",
+        "type": "FLOAT"
+    },
+    {
+        "name": "payment_type",
+        "type": "FLOAT"
+    },
+    {
+        "name": "fare_amount",
+        "type": "FLOAT"
+    },
+    {
+        "name": "extra",
+        "type": "FLOAT"
+    },
+    {
+        "name": "mta_tax",
+        "type": "FLOAT"
+    },
+    {
+        "name": "tip_amount",
+        "type": "FLOAT"
+    },
+    {
+        "name": "tolls_amount",
+        "type": "FLOAT"
+    },
+    {
+        "name": "improvement_surcharge",
+        "type": "FLOAT"
+    },
+    {
+        "name": "total_amount",
+        "type": "FLOAT"
+    },
+    {
+        "name": "congestion_surcharge",
+        "type": "FLOAT"
+    }
+]

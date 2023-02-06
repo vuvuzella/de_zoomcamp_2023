@@ -9,8 +9,11 @@ from pandas.io.parsers import TextFileReader
 
 import pathlib
 import os
+import json
 
 from prefect_gcp.cloud_storage import GcsBucket
+
+from prefect_gcp import GcpCredentials
 
 
 @task(
@@ -94,3 +97,44 @@ def write_parquet_file(df: DataFrame, filename: str) -> pathlib.Path:
 def write_to_gcs(source: str, destination: str) -> None:
     gcs_block = GcsBucket.load("gcs-data-store")
     gcs_block.upload_from_path(from_path=source, to_path=destination)  # type: ignore typing does not work for this library
+
+
+@task(retries=3)
+def extract_from_gcs(path: str) -> pathlib.Path:
+    # Get data from gcs and write to local filesystem
+    dest = "./gcp"
+    gcs_block = GcsBucket.load("gcs-data-store")
+    gcs_block.get_directory(from_path=path, local_path=dest)  # type: ignore
+    return pathlib.Path(f"{dest}/{path}")
+
+
+@task
+def create_schema_json(df: DataFrame):
+    schema: dict = pd.io.json.build_table_schema(df)  # type: ignore
+    open("./schema/yellow_tripdata_2021-01.json", "w").write(json.dumps(schema))
+
+
+@task(log_prints=True)
+def transform_gcs_data(path: pathlib.Path) -> DataFrame:
+    what = str(path)
+    df = pd.read_parquet(path)
+    print(
+        f"before replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
+    )
+    df["passenger_count"].fillna(0, inplace=True)  # replace 0 values with NA
+    print(
+        f"after after replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
+    )
+    return df
+
+
+@task
+def upload_to_bq(df: DataFrame) -> None:
+    gcp_credentials_block = GcpCredentials.load("service-account-cred")
+    df.to_gbq(
+        destination_table="de_zoomcamp_dataset.yellow_taxi_data",
+        project_id="de-zoomcamp-376020",
+        credentials=gcp_credentials_block.get_credentials_from_service_account(),  # type: ignore
+        chunksize=10_000,
+        if_exists="append",
+    )
