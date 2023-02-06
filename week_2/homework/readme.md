@@ -10,16 +10,16 @@ Using the flow in etl_web_to_gcs.py, create a deployment to run on the first of 
 
 3. How many rows did your flow code process?
 
-- Answer: 126348750 + 140985810 = 26733450
+- Answer: 7019375 + 7832545 = 14851920
 
 4. How many rows were processed by the script?
 
-- Answer: 
+- Answer: 88605
 
 5. How many rows were processed by the script?
 
-- Amswer: 
+- Amswer: 514392
 
 6. Prefect Secret blocks provide secure, encrypted storage in the database and obfuscation in the UI. Create a secret block in the UI that stores a fake 10-digit password to connect to a third-party service. Once you’ve created your block in the UI, how many characters are shown as asterisks (*) on the next page of the UI?
 
-- Answer:
+- Answer: ******** = 8
