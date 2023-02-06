@@ -80,32 +80,33 @@ def yellow_taxi_etl_flow():
 
 
 @flow(name="ETL Web To GCP", log_prints=True)
-def etl_web_to_gcs() -> None:
-    color = "yellow"
-    year = 2021
-    month = 1
+def etl_web_to_gcs(year: int, month: int, color: str) -> None:
     dataset_file = f"{color}_tripdata_{year}-{month:02}"
     dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
 
     df = fetch(dataset_url)
     clean_df = clean(df)
-    create_schema_json(clean_df)
+    create_schema_json(clean_df, color, year, month)
     path = write_parquet_file(clean_df, dataset_file)
     write_to_gcs(str(path), str(path))
 
 
 @flow(name="ETL GCP to BigQuery", log_prints=True)
-def etl_gcp_to_BigQuery():
+def etl_gcp_to_BigQuery(year: int, month: int, color: str) -> None:
     # Get from bigquery
     # Make additional transformations
     # Upload to Google BigQuery
-    color = "yellow"
-    month = 1
-    year = 2021
     filename = f"{color}_tripdata_{year}-{month:02}.parquet"
     gcp_path = f"data/{filename}"
 
     local_path = extract_from_gcs(gcp_path)
-    what = str(local_path)
     df = transform_gcs_data(local_path)
     upload_to_bq(df)
+
+
+@flow()
+def etl_parent_flow(
+    months: list[int] = [1, 2], year: int = 2021, color: str = "yellow"
+):
+    for month in months:
+        etl_web_to_gcs(month=month, year=year, color=color)

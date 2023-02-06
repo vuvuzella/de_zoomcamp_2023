@@ -87,7 +87,7 @@ def clean(df: DataFrame) -> DataFrame:
 @task
 def write_parquet_file(df: DataFrame, filename: str) -> pathlib.Path:
     path = pathlib.Path(f"data/{filename}.parquet")
-    if not os.path.exists(path):
+    if not os.path.exists("data"):
         os.makedirs("data/")
     df.to_parquet(path=path, compression="gzip")
     return path
@@ -109,14 +109,17 @@ def extract_from_gcs(path: str) -> pathlib.Path:
 
 
 @task
-def create_schema_json(df: DataFrame):
+def create_schema_json(df: DataFrame, color: str, year: int, month: int):
     schema: dict = pd.io.json.build_table_schema(df)  # type: ignore
-    open("./schema/yellow_tripdata_2021-01.json", "w").write(json.dumps(schema))
+    if not os.path.exists("./schema"):
+        os.makedirs("schema/")
+    open(f"./schema/{color}_tripdata_{year}-{month:02}.json", "w+").write(
+        json.dumps(schema)
+    )
 
 
 @task(log_prints=True)
 def transform_gcs_data(path: pathlib.Path) -> DataFrame:
-    what = str(path)
     df = pd.read_parquet(path)
     print(
         f"before replacement: number of zero passenger trips: {df['passenger_count'].isna().sum()}"
