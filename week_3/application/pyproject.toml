@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "etl"
+version = "0.1.0"
+description = ""
+authors = ["vuvuzella <j.tabacii@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^1.5.3"
+jupyter = "^1.0.0"
+psycopg2-binary = "^2.9.5"
+prefect = "^2.7.12"
+prefect-gcp = {extras = ["cloud-storage"], version = "^0.2.6"}
+prefect-sqlalchemy = "^0.2.2"
+pandas-gbq = "^0.19.1"
+prefect-dask = "^0.2.2"
+asyncio = "^3.4.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+etl = "etl.main:main"
