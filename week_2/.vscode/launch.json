@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Unit Tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "python": "${workspaceFolder}/application/.venv/bin/python",
+            "justMyCode": true,
+            "env": {
+                "DB_USERNAME": "de_zoomcamp",
+                "DB_PASSWORD": "de_zoomcamp",
+                "DB_HOST": "localhost",
+                "DB_PORT": "5433",
+                "DB_NAME": "de_zoomcamp"
+            },
+            "args": [
+                "-c",
+                "${workspaceFolder}/application/tests/pytest.ini",
+                "-s"
+            ]
+        },
+        {
+            "name": "Run ETL",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/application/etl_project/main.py",
+            "python": "${workspaceFolder}/application/.venv/bin/python",
+            "cwd": "${workspaceFolder}/application",
+            "justMyCode": false,
+            "env": {
+                "DB_USERNAME": "de_zoomcamp",
+                "DB_PASSWORD": "de_zoomcamp",
+                "DB_HOST": "localhost",
+                "DB_PORT": "5433",
+                "DB_NAME": "de_zoomcamp"
+            },
+            // "args": [
+            //     "run",
+            //     "etl"
+            // ]
+        }
+    ]
+}
