@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "etl"
+version = "0.1.0"
+description = ""
+authors = ["vuvuzella <j.tabacii@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+dbt-postgres = "^1.4.1"
+dbt-bigquery = "^1.4.0"
+prefect = "^2.8.0"
+prefect-gcp = {extras = ["cloud-storage"], version = "^0.2.6"}
+pandas = "^1.5.3"
+pyarrow = "^11.0.0"
+fastparquet = "^2023.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+etl="etl.main:main"
