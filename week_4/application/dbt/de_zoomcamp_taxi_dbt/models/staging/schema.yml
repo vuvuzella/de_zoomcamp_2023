@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw-trip-data
+    database: de-zoomcamp-376020 # dataset in bigquery
+    schema: week_4_dbt
+
+    tables:
+      - name: yellow_taxi_data
+      - name: green_taxi_data
