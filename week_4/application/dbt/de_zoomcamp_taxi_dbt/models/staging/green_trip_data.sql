@@ -3,6 +3,9 @@
 }}
 
 select
+
+    {{ dbt_utils.surrogate_key([ 'vendorid', 'lpep_pickup_datetime' ]) }} as tripid,
+
     -- identifiers
     cast(vendorid as integer) as vendorid,
     cast(ratecodeid as integer) as ratecodeid,
