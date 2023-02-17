@@ -32,6 +32,12 @@ clean-targets: # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   de_zoomcamp_taxi_dbt:
-    # Config indicated by + and applies to all files under models/example/
-    example:
+    # Config indicated by + and applies to all files under models/staging/
+    staging:
       +materialized: view
+
+seeds:
+  de_zoomcamp_taxi_dbt:
+    taxi_zone_lookup:
+      +column_types:
+        locationid: numeric # override the dtype of a column for your seed files
