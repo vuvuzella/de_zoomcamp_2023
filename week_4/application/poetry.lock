@@ -617,6 +617,24 @@ fasttext = ["fasttext"]
 langdetect = ["langdetect"]
 
 [[package]]
+name = "db-dtypes"
+version = "1.0.5"
+description = "Pandas Data Types for SQL systems (BigQuery, Spanner)"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "db-dtypes-1.0.5.tar.gz", hash = "sha256:ee68f30cbccf343124ef0abebc7f8cc9a74ef8ed7ee4ff61f586117e8040a9d6"},
+    {file = "db_dtypes-1.0.5-py2.py3-none-any.whl", hash = "sha256:ab6782bf7a414dd7289ce4ba8ddea5ec44c1339d189c7738d7098efdfd148266"},
+]
+
+[package.dependencies]
+numpy = ">=1.16.6,<2.0dev"
+packaging = ">=17.0"
+pandas = ">=0.24.2,<2.0dev"
+pyarrow = ">=3.0.0"
+
+[[package]]
 name = "dbt-bigquery"
 version = "1.4.0"
 description = "The Bigquery adapter plugin for dbt"
@@ -974,6 +992,25 @@ httplib2 = ">=0.15.0"
 six = "*"
 
 [[package]]
+name = "google-auth-oauthlib"
+version = "1.0.0"
+description = "Google Authentication Library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "google-auth-oauthlib-1.0.0.tar.gz", hash = "sha256:e375064964820b47221a7e1b7ee1fd77051b6323c3f9e3e19785f78ab67ecfc5"},
+    {file = "google_auth_oauthlib-1.0.0-py2.py3-none-any.whl", hash = "sha256:95880ca704928c300f48194d1770cf5b1462835b6e49db61445a520f793fd5fb"},
+]
+
+[package.dependencies]
+google-auth = ">=2.15.0"
+requests-oauthlib = ">=0.7.0"
+
+[package.extras]
+tool = ["click (>=6.0.0)"]
+
+[[package]]
 name = "google-cloud-bigquery"
 version = "3.5.0"
 description = "Google BigQuery API client library"
@@ -1008,6 +1045,53 @@ ipywidgets = ["ipywidgets (==7.7.1)"]
 opentelemetry = ["opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0)", "opentelemetry-sdk (>=1.1.0)"]
 pandas = ["db-dtypes (>=0.3.0,<2.0.0dev)", "pandas (>=1.1.0)", "pyarrow (>=3.0.0)"]
 tqdm = ["tqdm (>=4.7.4,<5.0.0dev)"]
+
+[[package]]
+name = "google-cloud-bigquery-storage"
+version = "2.16.2"
+description = "BigQuery Storage API API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-bigquery-storage-2.16.2.tar.gz", hash = "sha256:e6aca4f7b6f4eadb87f8510906177563518e1587c8b7b162bcf8e1c9e75ef416"},
+    {file = "google_cloud_bigquery_storage-2.16.2-py2.py3-none-any.whl", hash = "sha256:d037f238d0ab417c1e102a262c3fdb4b80cc630303bab358b1179260f47af0b7"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.32.0,<2.0.0 || >=2.8.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+fastavro = ["fastavro (>=0.21.2)"]
+pandas = ["pandas (>=0.21.1)"]
+pyarrow = ["pyarrow (>=0.15.0)"]
+
+[[package]]
+name = "google-cloud-bigquery-storage"
+version = "2.18.1"
+description = "Google Cloud Bigquery Storage API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-bigquery-storage-2.18.1.tar.gz", hash = "sha256:5cd3de59ef27606989aff315c6dd2e05931fd0dd90129e616207b444945652a0"},
+    {file = "google_cloud_bigquery_storage-2.18.1-py2.py3-none-any.whl", hash = "sha256:ddc97b5186dbde2009cff3254036d99d9b62b5cb737cf369f413a3cdf2ea5ae1"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = [
+    {version = ">=1.22.0,<2.0.0dev", markers = "python_version < \"3.11\""},
+    {version = ">=1.22.2,<2.0.0dev", markers = "python_version >= \"3.11\""},
+]
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+fastavro = ["fastavro (>=0.21.2)"]
+pandas = ["pandas (>=0.21.1)"]
+pyarrow = ["pyarrow (>=0.15.0)"]
 
 [[package]]
 name = "google-cloud-core"
@@ -2196,6 +2280,34 @@ pytz = ">=2020.1"
 test = ["hypothesis (>=5.5.3)", "pytest (>=6.0)", "pytest-xdist (>=1.31)"]
 
 [[package]]
+name = "pandas-gbq"
+version = "0.19.1"
+description = "Google BigQuery connector for pandas"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pandas-gbq-0.19.1.tar.gz", hash = "sha256:c31255cf23316c574ed06d8cbfb4240f487d691f39dcdc2e9192153c08351da4"},
+    {file = "pandas_gbq-0.19.1-py2.py3-none-any.whl", hash = "sha256:8733d78e169b0c4506ca7314c113e3240cf2b2accd83ba5cf456f1d13d79ebd3"},
+]
+
+[package.dependencies]
+db-dtypes = ">=1.0.4,<2.0.0"
+google-api-core = ">=2.10.2,<3.0.0dev"
+google-auth = ">=2.13.0"
+google-auth-oauthlib = ">=0.7.0"
+google-cloud-bigquery = ">=3.3.5,<4.0.0dev"
+google-cloud-bigquery-storage = ">=2.16.2,<3.0.0dev"
+numpy = ">=1.16.6"
+pandas = ">=1.1.4"
+pyarrow = ">=3.0.0"
+pydata-google-auth = ">=1.5.0"
+setuptools = "*"
+
+[package.extras]
+tqdm = ["tqdm (>=4.23.0)"]
+
+[[package]]
 name = "parsedatetime"
 version = "2.4"
 description = "Parse human-readable date/time text."
@@ -2594,6 +2706,23 @@ typing-extensions = ">=4.2.0"
 [package.extras]
 dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
+
+[[package]]
+name = "pydata-google-auth"
+version = "1.7.0"
+description = "PyData helpers for authenticating to Google APIs"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pydata-google-auth-1.7.0.tar.gz", hash = "sha256:87710d964898d2ddf56a9c4ddc9109a69279856596c3848408bdeb3a58fa3b8c"},
+    {file = "pydata_google_auth-1.7.0-py2.py3-none-any.whl", hash = "sha256:ad999065d3838002278008069cc38e3f1b694c705cedb5e20747219e363752c4"},
+]
+
+[package.dependencies]
+google-auth = {version = ">=1.25.0,<3.0dev", markers = "python_version >= \"3.6\""}
+google-auth-oauthlib = {version = ">=0.4.0", markers = "python_version >= \"3.6\""}
+setuptools = "*"
 
 [[package]]
 name = "pygments"
@@ -3437,4 +3566,4 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "94d67f9a1c158053bcb30e35287aa1ee9b57e15933b6998f8e2385e2d7d0e1bf"
+content-hash = "32c4cc12a9641911bff43656aff6609d4278e4f51fbcead311a4d711827d39f5"
