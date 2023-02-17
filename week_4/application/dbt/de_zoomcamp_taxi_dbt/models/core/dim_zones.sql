@@ -5,4 +5,4 @@ select
     borough,
     zone,
     replace(service_zone, 'Boro', 'Green') as service_zone
-from {{ ref('txi_zone_lookup') }}
+from {{ ref('taxi_zone_lookup') }}
