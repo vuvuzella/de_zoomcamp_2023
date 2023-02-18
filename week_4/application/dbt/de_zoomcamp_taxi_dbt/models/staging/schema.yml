@@ -8,3 +8,5 @@ sources:
     tables:
       - name: yellow_taxi_data
       - name: green_taxi_data
+# models:
+#   - name: stage_green_trip_data # should this name correspond to the table/view name?

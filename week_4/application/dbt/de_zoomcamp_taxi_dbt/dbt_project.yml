@@ -36,6 +36,9 @@ models:
     staging:
       +materialized: view
 
+vars:
+  payment_type_values: [1, 2, 3, 4, 5, 6] # see payment type descriptions macro
+
 seeds:
   de_zoomcamp_taxi_dbt:
     taxi_zone_lookup:
