@@ -6,6 +6,8 @@ Try running the following commands:
 - dbt run
 - dbt test
 
+to build the views without any limits, add to your run comman `--var is_test_run: false` to use all data
+
 
 ### Resources:
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)

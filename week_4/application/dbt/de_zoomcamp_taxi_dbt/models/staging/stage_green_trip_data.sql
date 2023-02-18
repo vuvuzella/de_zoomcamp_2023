@@ -2,11 +2,25 @@
     config(materialized='view')
 }}
 
+with trip_data as (
+    -- Deduplication to make tripid uniqueness test pass
+    select
+        *
+        -- row_number assign a rank number
+        -- over is a window function, defined by partition by and order by
+        -- partition by groups similar values, but does not reduce them
+        -- this means for each grouping created in the partition by clause, assign a number to them
+        -- This can be used to deduplicate by getting only the rank 1 (or any number really, we just want to get 1 row from the set of rows in that partition)
+        , row_number() over(partition by vendorid, lpep_pickup_datetime) as rn
+    from {{ source('raw-trip-data', 'green_taxi_data') }}
+    where vendorid is not null
+)
+
 select
 
-    {{ dbt_utils.surrogate_key([ 'vendorid', 'lpep_pickup_datetime' ]) }} as tripid,
 
     -- identifiers
+    {{ dbt_utils.surrogate_key([ 'vendorid', 'lpep_pickup_datetime' ]) }} as tripid,
     cast(vendorid as integer) as vendorid,
     cast(ratecodeid as integer) as ratecodeid,
     cast(pulocationid as integer) as pickup_locationid,
@@ -34,9 +48,8 @@ select
     cast(payment_type as integer) as payment_type,
     {{ get_payment_type_description('payment_type') }} as payment_type_description,
     cast(congestion_surcharge as numeric) as congestion_surcharge
-from {{
-    source('raw-trip-data', 'green_taxi_data')
-}}
+from trip_data
+where rn = 1
 
 -- dbt build --m <model.sql> --var 'is_test_run: false'
 {% if var('is_test_run', default=true) %}
