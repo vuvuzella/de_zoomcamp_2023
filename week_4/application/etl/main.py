@@ -15,6 +15,7 @@ def extract_data(url_source: str, dest_folder: str) -> str:
     write it as parquet file in data source
     """
     response = requests.get(url_source)
+    print(response.status_code)
     print(url_source)
     if not os.path.exists(dest_folder):
         os.makedirs(dest_folder)
@@ -36,19 +37,33 @@ def write_parquet(data_fp: str):
 
 
 @task(log_prints=True, retries=3, retry_delay_seconds=3, retry_jitter_factor=1.5)
-def transform_taxi_data(data_fp: str) -> None:
+def transform_taxi_data(data_fp: str) -> str:
     """
     Make columns in lowercase
     """
+    path = data_fp.split("/")
     df = pd.read_csv(data_fp, index_col=False)
     print(df.columns)
     df.columns = [str(column).lower() for column in df.columns]
-    df.to_csv(data_fp, compression="gzip", index=False)
+    new_filename = f"transformed-{path[-1]}"
+    path[-1] = new_filename
+    new_path = "/".join(path)
+    df.to_csv(new_path, compression="gzip", index=False)
+    return new_path
 
 
 @task(log_prints=True, cache_key_fn=task_input_hash, cache_expiration=timedelta(1))
 def transform_fhv_data(data_fp: str):
-    ...
+    path = data_fp.split("/")
+
+    df = pd.read_csv(data_fp, index_col=False)
+    print(df.columns)
+    df.columns = [str(column).lower() for column in df.columns]
+    new_filename = f"transformed-{path[-1]}"
+    path[-1] = new_filename
+    new_path = "/".join(path)
+    df.to_csv(new_path, compression="gzip", index=False)
+    return new_path
 
 
 @task(log_prints=True, retries=3, retry_delay_seconds=3, retry_jitter_factor=1.5)
@@ -94,24 +109,33 @@ def taxi_data_etl(
     ]
     for source in data_source:
         csv_fp = extract_data(source, f"data/taxi_data/{color}")
-        transform_taxi_data(csv_fp)
-        parquet_fp = write_parquet(csv_fp)
+        transformed_csv = transform_taxi_data(csv_fp)
+        parquet_fp = write_parquet(transformed_csv)
         upload_to_bigquery(parquet_fp, f"{dest_dataset}.{dest_table}")
 
 
 # TODO: Add fhv etl pipeline
 @flow(name="Week 4 ETL - For Hire Vehicle Data", log_prints=True)
-def fhv_data_etl(data_source_list: list[str]):
+def fhv_data_etl(
+    years: list[int], months: list[int], dest_dataset: str, dest_table: str
+):
+    base_link = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/fhv"
+    data_source_list = [
+        f"{base_link}/fhv_tripdata_{year}-{month:02}.csv.gz"
+        for year in years
+        for month in months
+    ]
     for source in data_source_list:
-        parquet_data_fp = extract_data(source, "")
-        # transform_fhv_data(parquet_data_fp)
-        # upload_to_bigquery(
-        #     parquet_data_fp,
-        # )
+        csv_fp = extract_data(source, "data/fhv")
+        transform_fhv_data(csv_fp)
+        parquet_fp = write_parquet(csv_fp)
+        upload_to_bigquery(parquet_fp, f"{dest_dataset}.{dest_table}")
 
 
 def main():
     dest_dataset = "week_4_dbt"
+
+    # Uncomment below to load taxi trips data
     taxi_data_etl(
         color="yellow",
         years=[2019, 2020],
@@ -119,13 +143,21 @@ def main():
         dest_dataset=dest_dataset,
         dest_table="yellow_taxi_data",
     )
-    taxi_data_etl(
-        color="green",
-        years=[2019, 2020],
-        months=list(range(1, 13)),
-        dest_dataset=dest_dataset,
-        dest_table="green_taxi_data",
-    )
+    # taxi_data_etl(
+    #     color="green",
+    #     years=[2019, 2020],
+    #     months=list(range(1, 13)),
+    #     dest_dataset=dest_dataset,
+    #     dest_table="green_taxi_data",
+    # )
+
+    # Uncomment below to load fhv data
+    # fhv_data_etl(
+    #     years=[2019],
+    #     months=list(range(1, 13)),
+    #     dest_dataset=dest_dataset,
+    #     dest_table="raw_fhv_data",
+    # )
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ with trip_data as (
         -- partition by groups similar values, but does not reduce them
         -- this means for each grouping created in the partition by clause, assign a number to them
         -- This can be used to deduplicate by getting only the rank 1 (or any number really, we just want to get 1 row from the set of rows in that partition)
-        , row_number() over(partition by vendorid, lpep_pickup_datetime) as rn
+        , row_number() over(partition by vendorid, lpep_pickup_datetime order by fare_amount, pulocationid, lpep_dropoff_datetime) as rn
     from {{ source('raw-trip-data', 'green_taxi_data') }}
     where vendorid is not null
 )
@@ -50,6 +50,7 @@ select
     cast(congestion_surcharge as numeric) as congestion_surcharge
 from trip_data
 where rn = 1
+-- from {{ source('raw-trip-data', 'green_taxi_data') }}
 
 -- dbt build --m <model.sql> --var 'is_test_run: false'
 {% if var('is_test_run', default=true) %}

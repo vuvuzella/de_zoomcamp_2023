@@ -8,6 +8,7 @@ sources:
     tables:
       - name: yellow_taxi_data
       - name: green_taxi_data
+      - name: raw_fhv_data
 
 # Documentation and tests for views and tables
 models:

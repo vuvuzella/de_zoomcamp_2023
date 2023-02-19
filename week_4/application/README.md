@@ -1,3 +1,6 @@
+## Looker Studio Public Dashboard of the data
+
+[View Dashboard](https://lookerstudio.google.com/s/jAW7JHp_6ak)
 ## notes
 
 1. `dbt run --select +<model.sql> ...` will run the model and all its dependencies in DAG
@@ -34,3 +37,10 @@
 
 - Columns
 - Models
+
+## TODO:
+1. Dockerize etl.
+2. Add task to upload your artifacts to GCS!
+3. DASK DASK DASK!
+4. Deployment, CICD for ETL and DBT
+5. Improve the notes

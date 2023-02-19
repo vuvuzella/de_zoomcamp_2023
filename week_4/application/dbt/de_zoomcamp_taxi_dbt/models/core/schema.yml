@@ -24,3 +24,7 @@ models:
         tests:
           - not_null:
               severity: error
+
+  - name: fact_fhv_trips
+    description: >
+      FHV trip data for 2019
