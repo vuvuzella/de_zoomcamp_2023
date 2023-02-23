@@ -9,11 +9,15 @@
 
 - Answer: 89.9 (Yellow) 10.1 (Green)
 
-3. What is the count of records in the model stg_fhv_tripdata after running all models with the test run variable disabled (:false)
+3. What is the count of records in the model stg_fhv_tripdata after running all models with the test run variable disabled
+
+- Answer: 63244696 (actual: 66387918)
+
+4. What is the count of records in the model fact_fhv_trips after running all dependencies with the test run variable disabled
 
 - Answer: 42998722 (actual result: 42847873)
 
-4. What is the month with the biggest amount of rides after building a tile for the fact_fhv_trips table
+5. What is the month with the biggest amount of rides after building a tile for the fact_fhv_trips table
 
 - Answer: January
 
