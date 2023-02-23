@@ -1,0 +1,7 @@
+.ipynb_checkpoints
+.venv
+*.csv
+*.csv.gz*
+*.parquet
+*.crc
+**/fhvhv
