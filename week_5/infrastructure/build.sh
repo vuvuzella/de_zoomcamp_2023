@@ -29,3 +29,7 @@ docker build \
   --build-arg jupyterlab_version="${JUPYTERLAB_VERSION}" \
   -f jupyterlab.Dockerfile \
   -t jupyterlab .
+
+docker build \
+  -f prefect.Dockerfile \
+  -t prefect .

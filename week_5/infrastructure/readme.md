@@ -9,3 +9,5 @@ Spark Worker I is accessible at `localhost:8081`
 Spark Worker II is accessible at `localhost:8082`
 
 In application, Spark master can be referenced using the uri `spark://spark-master:7077`
+
+For Prefect, the dashboard will only work if it is run using `docker compose up`. The dashboard will be unreachable if run using `docker compose run prefect`

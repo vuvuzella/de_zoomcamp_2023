@@ -2,13 +2,13 @@ version: '3.6'
 
 services:
 
-  jupyterlab:
-    image: jupyterlab
-    container_name: jupyterlab
-    ports:
-      - 8888:8888
-    volumes:
-      - ./shared-workspace:/opt/workspace
+  # jupyterlab:
+  #   image: jupyterlab
+  #   container_name: jupyterlab
+  #   ports:
+  #     - 8888:8888
+  #   volumes:
+  #     - ./shared-workspace:/opt/workspace
 
   spark-master:
     image: spark-master
@@ -16,7 +16,6 @@ services:
     ports:
       - 8080:8080
       - 7077:7077
-      - 4040:4040
     volumes:
       - ./shared-workspace:/opt/workspace
 
@@ -24,8 +23,8 @@ services:
     image: spark-worker
     container_name: spark-worker-1
     environment:
-      - SPARK_WORKER_CORES=2
-      - SPARK_WORKER_MEMORY=2gb
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=2048mb
     ports:
       - 8081:8081
     volumes:
@@ -37,11 +36,31 @@ services:
     image: spark-worker
     container_name: spark-worker-2
     environment:
-      - SPARK_WORKER_CORES=2
-      - SPARK_WORKER_MEMORY=2gb
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=2048mb
     ports:
       - 8082:8081
     volumes:
       - ./shared-workspace:/opt/workspace
     depends_on:
       - spark-master
+  prefect:
+    image: prefecthq/prefect:2-python3.9
+    environment:
+      - PREFECT_ORION_API_HOST=0.0.0.0
+    ports:
+      - 4200:4200
+    command: prefect server start
+    volumes:
+      - ./shared-workspace/prefect:/root/.prefect
+  # This may be deprecated by prefecthq/prefect image
+  # prefect-dashboard:
+  #   image: de_pipeline/week_2:latest
+  #   restart: always
+  #   environment:
+  #     - PREFECT_ORION_API_HOST=0.0.0.0
+  #   volumes:
+  #     - ./prefect_dashboard_volume:/root/.prefect
+  #   ports:
+  #     - 4200:4200
+  #   command: [ "poetry", "run", "prefect", "orion", "start" ]
