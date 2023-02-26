@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 @task
-def get_data(url, filename: str, color: str, year: str):
+def get_data(url, filename: str, color: str, year: str) -> str | None:
     dest = f"data/raw/{color}/{year}"
     file_path = f"{dest}/{filename}"
 
@@ -25,7 +25,13 @@ def get_data(url, filename: str, color: str, year: str):
     if not Path(file_path).is_file():
         print(f"Downloading {filename}")
         result = requests.get(url)
-        open(file_path, "wb").write(result.content)
+        if result.status_code == 200:
+            open(file_path, "wb").write(result.content)
+        else:
+            print(
+                f"Error processing {filename}: code: {result.status_code} message: {result.content}"
+            )
+            return None
 
     return file_path
 
@@ -40,14 +46,8 @@ def write_parquet(
     spark: SparkSession, fp: str, schema: StructType, color: str, year: str, month: int
 ):
     dest_path = f"data/pq/{color}/{year}/{month:02}"
-    spark_df = (
-        spark.read.option("header", "true")
-        .schema(schema)
-        .csv(
-            fp,
-        )
-    )
-    if not Path(dest_path).is_file():
+    spark_df = spark.read.option("header", "true").schema(schema).csv(fp)
+    if not Path(dest_path).is_dir():
         spark_df.repartition(8).write.parquet(dest_path)
 
 
@@ -68,18 +68,26 @@ def taxi_data_pipeline(
                 filename = f"{color}_tripdata_{year}-{month:02}.csv.gz"
                 url = f"{base_url}/{color}/{filename}"
                 fp = get_data(url, filename, color, year)
-                schema = schema_map.get(color, None)
-                if schema:
-                    write_parquet(spark, fp, schema, color, year, month)
+                if fp:
+                    schema = schema_map.get(color, None)
+                    if schema:
+                        write_parquet(spark, fp, schema, color, year, month)
+                    else:
+                        print(
+                            f"Skipping writing parquet for {filename}, no schema found"
+                        )
                 else:
-                    print(f"Skipping writing parquet for {filename}, no schema found")
+                    raise Exception(f"{url} not found")
 
 
 def main():
     print("Running Main")
     colors = ["yellow", "green"]
-    years = ["2020"]
-    month_map = {"2020": list(range(1, 13))}
+    years = ["2020", "2021"]
+    month_map = {
+        "2020": list(range(1, 13)),
+        "2021": list(range(1, 8)),
+    }
     schema_map = {
         "yellow": StructType(
             [
