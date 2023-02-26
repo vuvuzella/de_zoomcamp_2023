@@ -80,61 +80,98 @@ def taxi_data_pipeline(
                     raise Exception(f"{url} not found")
 
 
-def main():
-    print("Running Main")
-    colors = ["yellow", "green"]
-    years = ["2020", "2021"]
-    month_map = {
-        "2020": list(range(1, 13)),
-        "2021": list(range(1, 8)),
-    }
-    schema_map = {
-        "yellow": StructType(
-            [
-                StructField("VendorID", IntegerType(), True),
-                StructField("tpep_pickup_datetime", TimestampType(), True),
-                StructField("tpep_dropoff_datetime", TimestampType(), True),
-                StructField("passenger_count", IntegerType(), True),
-                StructField("trip_distance", DoubleType(), True),
-                StructField("RatecodeID", IntegerType(), True),
-                StructField("store_and_fwd_flag", StringType(), True),
-                StructField("PULocationID", IntegerType(), True),
-                StructField("DOLocationID", IntegerType(), True),
-                StructField("payment_type", IntegerType(), True),
-                StructField("fare_amount", DoubleType(), True),
-                StructField("extra", DoubleType(), True),
-                StructField("mta_tax", DoubleType(), True),
-                StructField("tip_amount", DoubleType(), True),
-                StructField("tolls_amount", DoubleType(), True),
-                StructField("improvement_surcharge", DoubleType(), True),
-                StructField("total_amount", DoubleType(), True),
-                StructField("congestion_surcharge", DoubleType(), True),
-            ]
-        ),
-        "green": StructType(
-            [
-                StructField("VendorID", IntegerType(), True),
-                StructField("lpep_pickup_datetime", TimestampType(), True),
-                StructField("lpep_dropoff_datetime", TimestampType(), True),
-                StructField("store_and_fwd_flag", StringType(), True),
-                StructField("RatecodeID", IntegerType(), True),
-                StructField("PULocationID", IntegerType(), True),
-                StructField("DOLocationID", IntegerType(), True),
-                StructField("passenger_count", IntegerType(), True),
-                StructField("trip_distance", DoubleType(), True),
-                StructField("fare_amount", DoubleType(), True),
-                StructField("extra", DoubleType(), True),
-                StructField("mta_tax", DoubleType(), True),
-                StructField("tip_amount", DoubleType(), True),
-                StructField("tolls_amount", DoubleType(), True),
-                StructField("ehail_fee", DoubleType(), True),
-                StructField("improvement_surcharge", DoubleType(), True),
-                StructField("total_amount", DoubleType(), True),
-                StructField("payment_type", IntegerType(), True),
-                StructField("trip_type", IntegerType(), True),
-                StructField("congestion_surcharge", DoubleType(), True),
-            ]
-        ),
-    }
+@flow
+def fvhv_data_pipeline():
+    base_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/fhvhv/fhvhv_tripdata_2021-06.csv.gz"
 
-    taxi_data_pipeline(colors, years, month_map, schema_map)
+    spark = create_spark_session()
+
+    result = requests.get(base_url)
+
+    dest_path = "data/raw/fvhv/2021"
+
+    if not Path(dest_path).is_dir():
+        os.makedirs(dest_path)
+
+    dest_file_path = f"{dest_path}/fvhv_tripdata_2021-06.csv.gz"
+
+    if not Path(dest_file_path).is_file():
+        open(dest_file_path, "wb").write(result.content)
+
+    schema = StructType(
+        [
+            StructField("dispatching_base_num", IntegerType(), True),
+            StructField("pickup_datetime", TimestampType(), True),
+            StructField("dropoff_datetime", TimestampType(), True),
+            StructField("PULocationID", IntegerType(), True),
+            StructField("DOLocationID", IntegerType(), True),
+            StructField("SR_Flag", StringType(), True),
+            StructField("Affiliated_base_number", StringType(), True),
+        ]
+    )
+
+    spark_df = spark.read.option("header", "true").schema(schema).csv(dest_file_path)
+    parquet_fp = "data/pq/fvhv/2021"
+    spark_df.repartition(12).write.parquet(parquet_fp, mode="overwrite")
+
+
+def main():
+
+    fvhv_data_pipeline()
+
+    # colors = ["yellow", "green"]
+    # years = ["2020", "2021"]
+    # month_map = {
+    #     "2020": list(range(1, 13)),
+    #     "2021": list(range(1, 8)),
+    # }
+    # schema_map = {
+    #     "yellow": StructType(
+    #         [
+    #             StructField("VendorID", IntegerType(), True),
+    #             StructField("tpep_pickup_datetime", TimestampType(), True),
+    #             StructField("tpep_dropoff_datetime", TimestampType(), True),
+    #             StructField("passenger_count", IntegerType(), True),
+    #             StructField("trip_distance", DoubleType(), True),
+    #             StructField("RatecodeID", IntegerType(), True),
+    #             StructField("store_and_fwd_flag", StringType(), True),
+    #             StructField("PULocationID", IntegerType(), True),
+    #             StructField("DOLocationID", IntegerType(), True),
+    #             StructField("payment_type", IntegerType(), True),
+    #             StructField("fare_amount", DoubleType(), True),
+    #             StructField("extra", DoubleType(), True),
+    #             StructField("mta_tax", DoubleType(), True),
+    #             StructField("tip_amount", DoubleType(), True),
+    #             StructField("tolls_amount", DoubleType(), True),
+    #             StructField("improvement_surcharge", DoubleType(), True),
+    #             StructField("total_amount", DoubleType(), True),
+    #             StructField("congestion_surcharge", DoubleType(), True),
+    #         ]
+    #     ),
+    #     "green": StructType(
+    #         [
+    #             StructField("VendorID", IntegerType(), True),
+    #             StructField("lpep_pickup_datetime", TimestampType(), True),
+    #             StructField("lpep_dropoff_datetime", TimestampType(), True),
+    #             StructField("store_and_fwd_flag", StringType(), True),
+    #             StructField("RatecodeID", IntegerType(), True),
+    #             StructField("PULocationID", IntegerType(), True),
+    #             StructField("DOLocationID", IntegerType(), True),
+    #             StructField("passenger_count", IntegerType(), True),
+    #             StructField("trip_distance", DoubleType(), True),
+    #             StructField("fare_amount", DoubleType(), True),
+    #             StructField("extra", DoubleType(), True),
+    #             StructField("mta_tax", DoubleType(), True),
+    #             StructField("tip_amount", DoubleType(), True),
+    #             StructField("tolls_amount", DoubleType(), True),
+    #             StructField("ehail_fee", DoubleType(), True),
+    #             StructField("improvement_surcharge", DoubleType(), True),
+    #             StructField("total_amount", DoubleType(), True),
+    #             StructField("payment_type", IntegerType(), True),
+    #             StructField("trip_type", IntegerType(), True),
+    #             StructField("congestion_surcharge", DoubleType(), True),
+    #         ]
+    #     ),
+    # }
+
+    # taxi_data_pipeline(colors, years, month_map, schema_map)
