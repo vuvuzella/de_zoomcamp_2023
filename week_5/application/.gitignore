@@ -5,3 +5,6 @@
 *.parquet
 *.crc
 **/fhvhv
+
+__pycache__
+data

@@ -11,8 +11,15 @@ python = "^3.10"
 pyspark = "^3.3.2"
 jupyter = "^1.0.0"
 pandas = "^1.5.3"
+ipykernel = "^6.21.2"
 
+
+[tool.poetry.group.etl.dependencies]
+prefect = "^2.8.3"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+etl = "etl.main:main"
