@@ -13,9 +13,7 @@ def main():
     config = {
         "bootstrap_servers": SETTINGS.bootstrap_servers,
         "key_serializer": lambda key: str(key).encode(),
-        "value_serializer": lambda x: json.dumps(x.__dict__, default=str).encode(
-            "utf-8"
-        ),
+        "value_serializer": lambda x: json.dumps(x, default=str).encode("utf-8"),
     }
 
     producer = JsonProducer[GreenRide](publish_key="pu_location_id", **config)

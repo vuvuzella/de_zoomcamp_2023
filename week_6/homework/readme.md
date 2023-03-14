@@ -33,3 +33,8 @@
 - Group-Id
 - Offset    (select)
 - Cluster Key and Cluster-Secret
+
+
+Please implement a streaming application, for finding out popularity of PUlocationID across green and fhv trip datasets
+
+Please use the datasets [fhv_tripdata_2019-01.csv.gz](https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/fhv) and [green_tripdata_2019-01.csv.gz](https://github.com/DataTalksClub/nyc-tlc-data/releases/tag/green)
