@@ -74,7 +74,7 @@ class GreenRide(Ride):
     lpep_dropoff_datetime: datetime
 
     def __init__(self, **data) -> None:
-
+        # pop the key off the dictionary to be able to add **data in the kwargs of the parent class
         lpep_pickup_datetime = data.pop("lpep_pickup_datetime", None)
         lpep_dropoff_datetime = data.pop("lpep_dropoff_datetime", None)
 
