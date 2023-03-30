@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "main"
+name = "etl_app"
 version = "0.1.0"
 description = ""
 authors = ["vuvuzella <j.tabacii@gmail.com>"]
@@ -10,8 +10,14 @@ python = "^3.10"
 dbt-bigquery = "^1.4.3"
 prefect = "^2.8.7"
 prefect-gcp = "^0.3.0"
+prefect-dbt = {extras = ["bigquery"], version = "^0.3.1"}
+pyspark = "3.0.0"
+pandas-gbq = "^0.19.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+etl_app = "etl_app.__main__:main"

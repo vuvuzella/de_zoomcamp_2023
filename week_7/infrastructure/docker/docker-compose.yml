@@ -27,6 +27,7 @@ services:
       - 7077:7077
     volumes:
       - ./shared-workspace:/opt/workspace
+      - ../../data:/opt/workspace/data:rw
 
   spark-worker-1:
     image: spark-worker
@@ -35,12 +36,13 @@ services:
       dockerfile: spark-worker.Dockerfile
     container_name: spark-worker-1
     environment:
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=2048mb
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=40968mb
     ports:
-      - 8081:8081
+      - 8081:8080
     volumes:
       - ./shared-workspace:/opt/workspace
+      - ../../data:/opt/workspace/data:rw
     depends_on:
       - spark-master
 
@@ -51,12 +53,13 @@ services:
       context: ./
       dockerfile: spark-worker.Dockerfile
     environment:
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=2048mb
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=40968mb
     ports:
-      - 8082:8081
+      - 8082:8080
     volumes:
       - ./shared-workspace:/opt/workspace
+      - ../../data:/opt/workspace/data:rw
     depends_on:
       - spark-master
 
