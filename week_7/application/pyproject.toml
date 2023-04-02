@@ -13,6 +13,7 @@ prefect-gcp = "^0.3.0"
 prefect-dbt = {extras = ["bigquery"], version = "^0.3.1"}
 pyspark = "3.0.0"
 pandas-gbq = "^0.19.1"
+google-cloud-bigquery = "^3.9.0"
 
 
 [build-system]
