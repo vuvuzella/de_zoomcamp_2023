@@ -58,9 +58,9 @@ def unzip_file_to_destination(source: str, destination: str):
 
 @task(
     log_prints=True,
-    # cache_result_in_memory=True,
-    # cache_key_fn=task_input_hash,
-    # cache_expiration=timedelta(1),  # cache expires after 1 data
+    cache_result_in_memory=True,
+    cache_key_fn=task_input_hash,
+    cache_expiration=timedelta(1),  # cache expires after 1 data
     retry_jitter_factor=1.5,
     retry_delay_seconds=exponential_backoff(backoff_factor=10),
 )
@@ -78,15 +78,15 @@ def upload_to_datalake(
         from_path = source / file
         to_path = destination / file
         bucket.upload_from_path(from_path=from_path, to_path=to_path)  # type: ignore
-        # print(f"Successfully uploaded {file} to {to_path}")
+        print(f"Successfully uploaded {file} to {to_path}")
     return files
 
 
 @task(
     log_prints=True,
-    # cache_result_in_memory=False,
-    # cache_key_fn=task_input_hash,
-    # cache_expiration=timedelta(1),  # cache expires after 1 data
+    cache_result_in_memory=False,
+    cache_key_fn=task_input_hash,
+    cache_expiration=timedelta(1),  # cache expires after 1 data
 )
 def csv_transform(
     base_dir: Path,
@@ -104,13 +104,14 @@ def csv_transform(
         # basic transformations
         if len(drop_cols):
             df_csv = df_csv.drop(
-                columns=drop_cols, axis=0
+                columns=[df_csv.columns[col] for col in drop_cols], axis=1
             )  # drop unwanted unnamed first column
 
         # write csv to out
         df_csv.to_csv(
             path_or_buf=out_fp, index=False
         )  # write transformed csv, compressed
+        print(f"Successfully transformed csv: {file}")
 
 
 @task(
@@ -128,15 +129,16 @@ def convert_to_parqet(base_dir: Path, files: List[str], out_dir: Path):
         out_fp = out_dir / file.replace(".csv", ".parquet")
         df_csv = pd.read_csv(str(in_fp))
         df_csv.astype(str).to_parquet(path=str(out_fp), compression="gzip", index=False)
+        print(f"Successfully converted to parquet: {file}")
 
 
 @task(
     log_prints=False,
-    # cache_result_in_memory=False,
-    # cache_key_fn=task_input_hash,
-    # cache_expiration=timedelta(1),  # cache expires after 1 data
-    # retry_jitter_factor=1.5,
-    # retry_delay_seconds=exponential_backoff(backoff_factor=10),
+    cache_result_in_memory=False,
+    cache_key_fn=task_input_hash,
+    cache_expiration=timedelta(1),  # cache expires after 1 data
+    retry_jitter_factor=1.5,
+    retry_delay_seconds=exponential_backoff(backoff_factor=10),
 )
 def upload_to_data_warehouse(
     base_dir: Path,
@@ -148,7 +150,6 @@ def upload_to_data_warehouse(
     client = bigquery.Client(credentials=gcp_credential_block.get_credentials_from_service_account())  # type: ignore
     for filename, table, schema, drop_cols in file_table_tuples:
         fn = filename.replace(".csv", ".parquet")
-        # print(f"** Processing {fn}")
         fp = f"gs://{base_dir / fn}"
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.PARQUET,
@@ -162,11 +163,7 @@ def upload_to_data_warehouse(
         )
 
         load_job.result()
-
-        # df_parquet = pd.read_parquet(path=fp)
-        # Force table schema to STRING, for each column, create schema of type STRING
-        # columns = df_parquet.columns
-        # schema = [{"name": column, "type": "STRING"} for column in columns]
+        print(f"Successfully uploaded to BigQuery: {fn}")
 
 
 @task
@@ -197,7 +194,18 @@ def run_anz_road_crash_etl():
     )
 
     file_table_tuples: List[Tuple[str, str, List[bigquery.SchemaField], List[int]]] = [
-        # ("Casualties.csv", "raw_casualties"),
+        (
+            "Casualties.csv",
+            "raw_casualties",
+            [
+                bigquery.SchemaField("casualties_id", "STRING"),
+                bigquery.SchemaField("casualties", "STRING"),
+                bigquery.SchemaField("fatalities", "STRING"),
+                bigquery.SchemaField("serious_injuries", "STRING"),
+                bigquery.SchemaField("minor_injuries", "STRING"),
+            ],
+            [0],
+        ),
         (
             "Crash2.csv",
             "raw_crashes",
@@ -209,30 +217,86 @@ def run_anz_road_crash_etl():
                 bigquery.SchemaField("vehicles_id", "STRING"),
                 bigquery.SchemaField("casualties_id", "STRING"),
             ],
-            []
-            # [
-            #     bigquery.SchemaField("description_id", "STRING"),
-            #     bigquery.SchemaField("severity", "STRING"),
-            #     bigquery.SchemaField("speed_limit", "STRING"),
-            #     bigquery.SchemaField("midblock", "STRING"),
-            #     bigquery.SchemaField("intersection", "STRING"),
-            #     bigquery.SchemaField("road_position_horizontal", "STRING"),
-            #     bigquery.SchemaField("road_position_vertical", "STRING"),
-            #     bigquery.SchemaField("road_sealed", "STRING"),
-            #     bigquery.SchemaField("road_wet", "STRING"),
-            #     bigquery.SchemaField("weather", "STRING"),
-            #     bigquery.SchemaField("crash_type", "STRING"),
-            #     bigquery.SchemaField("lighting", "STRING"),
-            #     bigquery.SchemaField("traffic_controls", "STRING"),
-            #     bigquery.SchemaField("drugs_alcohol", "STRING"),
-            #     bigquery.SchemaField("DCA_code", "STRING"),
-            #     bigquery.SchemaField("comment", "STRING"),
-            # ],
+            [],  # columns to drop
         ),
-        # ("DateTime.csv", "raw_datetimes"),
-        # ("Description.csv", "raw_descriptions"),
-        # ("Location2.csv", "raw_locations"),
-        # ("Vehicles.csv", "raw_vehicles"),
+        (
+            "DateTime.csv",
+            "raw_datetimes",
+            [
+                bigquery.SchemaField("date_time_id", "STRING"),
+                bigquery.SchemaField("year", "STRING"),
+                bigquery.SchemaField("month", "STRING"),
+                bigquery.SchemaField("day_of_week", "STRING"),
+                bigquery.SchemaField("day_of_month", "STRING"),
+                bigquery.SchemaField("hour", "STRING"),
+                bigquery.SchemaField("approximate", "STRING"),
+            ],
+            [0],  # skip unknown column
+        ),
+        (
+            "Description.csv",
+            "raw_descriptions",
+            [
+                bigquery.SchemaField("description_id", "STRING"),
+                bigquery.SchemaField("severity", "STRING"),
+                bigquery.SchemaField("speed_limit", "STRING"),
+                bigquery.SchemaField("midblock", "STRING"),
+                bigquery.SchemaField("intersection", "STRING"),
+                bigquery.SchemaField("road_position_horizontal", "STRING"),
+                bigquery.SchemaField("road_position_vertical", "STRING"),
+                bigquery.SchemaField("road_sealed", "STRING"),
+                bigquery.SchemaField("road_wet", "STRING"),
+                bigquery.SchemaField("weather", "STRING"),
+                bigquery.SchemaField("crash_type", "STRING"),
+                bigquery.SchemaField("lighting", "STRING"),
+                bigquery.SchemaField("traffic_controls", "STRING"),
+                bigquery.SchemaField("drugs_alcohol", "STRING"),
+                bigquery.SchemaField("DCA_code", "STRING"),
+                bigquery.SchemaField("comment", "STRING"),
+            ],
+            [0],
+        ),
+        (
+            "Location2.csv",
+            "raw_locations",
+            [
+                bigquery.SchemaField("lat_long", "STRING"),
+                bigquery.SchemaField("latitude", "STRING"),
+                bigquery.SchemaField("longitude", "STRING"),
+                bigquery.SchemaField("country", "STRING"),
+                bigquery.SchemaField("state", "STRING"),
+                bigquery.SchemaField("local_government_area", "STRING"),
+                bigquery.SchemaField("statistical_area", "STRING"),
+                bigquery.SchemaField("suburb", "STRING"),
+            ],
+            [],
+        ),
+        (
+            "Vehicles.csv",
+            "raw_vehicles",
+            [
+                bigquery.SchemaField("vehicles_id", "STRING"),
+                bigquery.SchemaField("animals", "STRING"),
+                bigquery.SchemaField("car_sedan", "STRING"),
+                bigquery.SchemaField("car_utility", "STRING"),
+                bigquery.SchemaField("car_van", "STRING"),
+                bigquery.SchemaField("car_4x4", "STRING"),
+                bigquery.SchemaField("car_station_wagon", "STRING"),
+                bigquery.SchemaField("motor_cycle", "STRING"),
+                bigquery.SchemaField("truck_small", "STRING"),
+                bigquery.SchemaField("truck_large", "STRING"),
+                bigquery.SchemaField("bus", "STRING"),
+                bigquery.SchemaField("taxi", "STRING"),
+                bigquery.SchemaField("bicycle", "STRING"),
+                bigquery.SchemaField("scooter", "STRING"),
+                bigquery.SchemaField("pedestrian", "STRING"),
+                bigquery.SchemaField("inanimate", "STRING"),
+                bigquery.SchemaField("train", "STRING"),
+                bigquery.SchemaField("tram", "STRING"),
+                bigquery.SchemaField("vehicle_other", "STRING"),
+            ],
+            [0],
+        ),
     ]
 
     file_list = [pair[0] for pair in file_table_tuples]
@@ -251,8 +315,6 @@ def run_anz_road_crash_etl():
 
     dataset_id = "anz_road_crash_dataset"
     project_id = "de-final-project-381710"
-
-    gcp_credential_block = GcpCredentials.load("gcp-service-account")
 
     upload_to_datalake(
         source=parquet_output_path,
@@ -300,37 +362,3 @@ if __name__ == "__main__":
 #         )
 #         df = spark.read.option("header", "True").csv(f"file:///{str(fp)}")
 #         print(df)
-
-# schema_casualty = StructType(
-#     List(
-#         # StructField(_c0,StringType,true), # Remove this column
-#         StructField(name=casualties_id, dataType=StringType, nullable=true),
-#         StructField(name=casualties, dataType=StringType, nullable=true),
-#         StructField(name=fatalities, dataType=StringType, nullable=true),
-#         StructField(name=serious_injuries, dataType=StringType, nullable=true),
-#         StructField(name=minor_injuries, dataType=StringType, nullable=true),
-#     )
-# )
-
-# schema_crash = StructType(
-#     List(
-#         StructField(name=crash_id, dataType=StringType, nullable=true),
-#         StructField(name=lat_long, dataType=StringType, nullable=true),
-#         StructField(name=date_time_id, dataType=StringType, nullable=true),
-#         StructField(name=description_id, dataType=StringType, nullable=true),
-#         StructField(name=vehicles_id, dataType=StringType, nullable=true),
-#         StructField(name=casualties_id, dataType=StringType, nullable=true),
-#     )
-# )
-
-# schema_datetime = StructType(
-#     List(
-#         StructField(name=date_time_id, dataType=StringType, nullable=true),
-#         StructField(name=year, dataType=StringType, nullable=true),
-#         StructField(name=month, dataType=StringType, nullable=true),
-#         StructField(name=day_of_week, dataType=StringType, nullable=true),
-#         StructField(name=day_of_month, dataType=StringType, nullable=true),
-#         StructField(name=hour, dataType=StringType, nullable=true),
-#         StructField(name=approximate, dataType=StringType, nullable=true),
-#     )
-# )
