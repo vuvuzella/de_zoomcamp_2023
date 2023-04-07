@@ -28,8 +28,8 @@ resource "google_storage_bucket" "data-lake-bucket" {
   }
 }
 
-resource "google_bigquery_dataset" "dataset" {
-  dataset_id = local.dataset_name
-  project    = local.project_name
-  location   = local.region
-}
+# resource "google_bigquery_dataset" "dataset" {
+#   dataset_id = local.dataset_name
+#   project    = local.project_name
+#   location   = local.region
+# }
