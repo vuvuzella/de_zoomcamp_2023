@@ -1,0 +1,10 @@
+bigquery:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('DBT_BQ_PROJECT') }}"
+      dataset: "{{ env_var('DBT_BQ_DATASET')}}"
+      threads: 4
+      keyfile: "{{ env_var('DBT_BQ_KEYFILE') }}"
