@@ -1,5 +1,4 @@
 .venv
-dbt_transformation
 logs
 __pycache__
 dist

@@ -33,3 +33,6 @@ Be able to create an end-to-end data pipeline that involves the following
 2. ETL code from GCS to Data warehouse
 3. DBT code to transform/create views in data warehouse
 4. A Dashboard to do analytics
+
+### Accompanying Data Dictionary
+* More information on the columns can be found here: https://github.com/mgray39/anz-crash/blob/master/Australian%20%26%20New%20Zealand%20Road%20Crash.ipynb
