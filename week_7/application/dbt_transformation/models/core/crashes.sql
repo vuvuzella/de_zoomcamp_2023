@@ -8,7 +8,8 @@ select
     cast(description_id as int) as description_id,
     cast(vehicles_id as string) as vehicles_id,
     cast(casualties_id as string) as casualties_id,
-    trim(split(replace(replace(lat_long, '(', ''), ')', '' ), ',')[offset(0)]) as latitude,
-    trim(split(replace(replace(lat_long, '(', ''), ')', '' ), ',')[offset(1)]) as longitude,
+    {{ dbt_utils.generate_surrogate_key(['lat_long']) }} as location_id,
+    {{ get_latitude('lat_long') }} as latitude,
+    {{ get_longitude('lat_long') }} as longitude,
 
 from {{ source('anz_road_crash_dataset', 'raw_crashes') }}
