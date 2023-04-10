@@ -9,6 +9,9 @@ Be able to create an end-to-end data pipeline that involves the following
 3. Perform transformations on raw data to be able to provide the needed data to dashboards
 4. Create a dashboard that consumes the transformed views of the raw data
 
+## Data Being Explored
+1. Be able to filter
+
 ## Method
 * Batch Processing using Prefect
 

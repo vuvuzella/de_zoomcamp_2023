@@ -11,6 +11,9 @@ select
         when local_government_area = 'nan' then null
         else cast(local_government_area as string)
     end as local_government_area,
-    cast(suburb as string) as suburb
+    case
+        when suburb = 'nan' then null
+        else cast(suburb as string)
+    end as suburb
 
 from {{ source('anz_road_crash_dataset', 'raw_locations')}}

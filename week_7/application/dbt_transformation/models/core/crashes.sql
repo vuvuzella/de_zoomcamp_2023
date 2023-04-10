@@ -3,12 +3,13 @@
 
 select
 
-    cast(crash_id as string) as id,
-    cast(date_time_id as string) as date_time_id,
-    cast(description_id as int) as description_id,
-    cast(vehicles_id as string) as vehicles_id,
-    cast(casualties_id as string) as casualties_id,
+    {{ dbt_utils.generate_surrogate_key(['crash_id']) }} as id,
+    {{ dbt_utils.generate_surrogate_key(['date_time_id']) }} as datetime_id,
+    {{ dbt_utils.generate_surrogate_key(['description_id']) }} as description_id,
+    {{ dbt_utils.generate_surrogate_key(['vehicles_id']) }} as vehicles_id,
+    {{ dbt_utils.generate_surrogate_key(['casualties_id'])}} as casualties_id,
     {{ dbt_utils.generate_surrogate_key(['lat_long']) }} as location_id,
+
     {{ get_latitude('lat_long') }} as latitude,
     {{ get_longitude('lat_long') }} as longitude,
 

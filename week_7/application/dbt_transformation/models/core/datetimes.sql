@@ -2,15 +2,18 @@
 
 select
 
-    {{ dbt_utils.generate_surrogate_key(['date_time_id'])}} as id,
+    {{ dbt_utils.generate_surrogate_key(['date_time_id']) }} as id,
     cast(year as int) as year,
-    cast(month as int) as month,
-    cast(day_of_week as int) as day_of_week,
+    {{ get_int('month') }} as month,
+    case
+        when day_of_week = 'nan' then null
+        else {{ get_int('day_of_week') }}
+    end as day_of_week,
     case
         when day_of_month = 'nan' then null
-        else cast(day_of_month as int)
+        else {{ get_int('day_of_month') }}
     end as day_of_month,
-    cast(hour as int) as hour,
+    {{ get_int('hour') }}as hour,
     cast(approximate as bool) as approximate
 
 
