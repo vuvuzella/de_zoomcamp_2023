@@ -4,6 +4,6 @@
 
 {% macro get_int(input) -%}
 
-    trim(split({{ input }}, '.')[offset(0)])
+    cast(trim(split({{ input }}, '.')[offset(0)]) as int)
 
 {%- endmacro%}

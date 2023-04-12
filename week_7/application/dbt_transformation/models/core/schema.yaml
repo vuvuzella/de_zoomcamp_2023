@@ -11,7 +11,7 @@ sources:
       - name: raw_vehicles
 
 models:
-  - name: locations
+  - name: dim_locations
     description: >
       Location of where the road crash has occurred
     columns:
@@ -22,7 +22,7 @@ models:
         description: >
           Latitude
 
-  - name: casualties
+  - name: fact_casualties
     descriptions: >
       Number of persons injured or killed as result of the incident
     columns:
@@ -40,7 +40,7 @@ models:
         description: >
           Total number of minor injuries
 
-  - name: crashes
+  - name: fact_crashes
     description: >
       Record of crashes
     columns:

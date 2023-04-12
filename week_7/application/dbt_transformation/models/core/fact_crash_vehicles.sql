@@ -23,6 +23,6 @@ select
     vehicles.inanimate,
     vehicles.vehicle_other
 
-from {{ ref('crashes') }} crashes
-left join {{ ref('vehicles') }} vehicles
+from {{ ref('fact_crashes') }} crashes
+left join {{ ref('fact_vehicles') }} vehicles
 on crashes.vehicles_id = vehicles.id

@@ -12,6 +12,6 @@ select
     locations.state,
     locations.local_government_area,
 
-from {{ ref('crashes') }} crashes
-left join {{  ref('locations') }} locations
+from {{ ref('fact_crashes') }} crashes
+left join {{  ref('dim_locations') }} locations
 on crashes.location_id = locations.id

@@ -3,7 +3,6 @@
 select
 
     {{ dbt_utils.generate_surrogate_key(['vehicles_id']) }} as id,
-    {{ get_int('animals') }} as animals,
     {{ get_int('car_sedan') }} as car_sedan,
     {{ get_int('car_utility') }} as car_utility,
     {{ get_int('car_van') }} as car_van,
@@ -20,6 +19,8 @@ select
     {{ get_int('inanimate') }} as inanimate,
     {{ get_int('train') }} as train,
     {{ get_int('tram') }} as tram,
+    {{ get_int('animals') }} as animals,
     {{ get_int('vehicle_other') }} as vehicle_other,
 
 from {{ source('anz_road_crash_dataset', 'raw_vehicles') }}
+where vehicles_id != 'nan'

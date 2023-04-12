@@ -7,6 +7,6 @@ select
     datetimes.month,
     datetimes.year,
     datetimes.hour
-from {{ ref('crashes') }} crashes
-left join {{ ref('datetimes') }} datetimes
+from {{ ref('fact_crashes') }} crashes
+left join {{ ref('dim_datetimes') }} datetimes
 on crashes.datetime_id = datetimes.id
