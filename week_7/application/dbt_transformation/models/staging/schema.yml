@@ -1,0 +1,113 @@
+version: 2
+
+sources:
+  - name: anz_road_crash_dataset
+    tables:
+      - name: raw_casualties
+      - name: raw_crashes
+      - name: raw_datetimes
+      - name: raw_descriptions
+      - name: raw_locations
+      - name: raw_vehicles
+
+models:
+  - name: stg_locations
+    description: >
+      Location of where the road crash has occurred
+    columns:
+      - name: latitude
+        description: >
+          Combined lat-long enclosed in parenthesis i.e. `(latitude, longitude)`
+      - name: longitude
+        description: >
+          Latitude
+
+  - name: stg_casualties
+    descriptions: >
+      Number of persons injured or killed as result of the incident
+    columns:
+      - name: id
+      - name: casualties
+        description: >
+          Total number of people involved in the crash
+      - name: fatalities
+        description: >
+          Total number of people who died
+      - name: serious_injuries
+        description: >
+          Total number of serious injuries
+      - name: minor_injuries
+        description: >
+          Total number of minor injuries
+
+  - name: stg_crashes
+    description: >
+      Record of crashes
+    columns:
+      - name: id
+        description: >
+          id of the crash
+      - name: datetime_id
+        description: >
+          id of the datetime
+      - name: description_id
+        description: >
+          id of the description
+      - name: vehicles_id
+        description: >
+          id of the vehicle type
+      - name: casualties_id
+        description: >
+          id of the casualties involved
+
+  - name: stg_descriptions
+    descriptions: >
+      Record of qualitative descriptions of the environmental and meteorological conditions of the crash
+
+    columns:
+      - name: id
+      - name: severity
+        description: >
+          property_damage, minor_injury, serious_injury, fatality
+      - name: speed_limit
+        description: >
+          Speed limit in the zone where the crash happened
+      - name: midblock
+        description: >
+          Accident happened away from an intersection or not
+      - name: intersection
+        description: >
+          Accident happened at an intersection or not
+      - name: road_position_horizontal
+        description: >
+          Degree of turn: straign, curved_view_open, curved_view_obscure
+      - name: road_position_vertical
+        description: >
+          road was sloping or flat: level, crest, slope, dip, unknown
+      - name: road_sealed
+        description: >
+          Road surface condition (not sealed means road is loose gravel/pavement)
+      - name: road_wet
+        description: >
+          Road surface is wet
+      - name: weather
+        description: >
+          Fine, smoke_dust, fog, rain, snow, mist, high_wind, overcast, other, unknown
+      - name: crash_type
+        description: >
+          Type of crash. Each source has its own value that is too complex to have a standard value
+      - name: lighting
+        description: >
+          daylight, darkness_lit, darkness_not_lit, dawn_dusk, other, unknown
+      - name: traffic_controls
+        description: >
+          none (no traffic lights etc.), stop_sign, traffic_lights, railway_crossing, giveway_sign, pedestrian_crossing, school_crossing, manual_control, other
+      - name: drugs_alcohol
+        description: >
+          If drugs and/or alcohol is involved (Only came from SA dataset)
+      - name: DCA_code
+        description: >
+          Alphanumeric representation of the type of crash.
+      - name: comment
+        description: >
+          DCA code comment/description

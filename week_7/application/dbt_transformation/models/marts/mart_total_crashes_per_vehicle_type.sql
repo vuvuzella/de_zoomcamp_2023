@@ -26,7 +26,7 @@ from
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
 
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -52,7 +52,7 @@ union all
         -- sum(inanimate) as inanimate,
         -- sum(vehicle_other) as vehicle_other
 
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -75,7 +75,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 
@@ -98,7 +98,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -119,7 +119,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -139,7 +139,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -158,7 +158,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -176,7 +176,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -193,7 +193,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -209,7 +209,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -224,7 +224,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -238,7 +238,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -251,7 +251,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -263,7 +263,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -274,7 +274,7 @@ union all
             -- sum(animals) as animals,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -284,7 +284,7 @@ union all
             sum(animals) as total,
             -- sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -293,7 +293,7 @@ union all
             'inanimate' as type,
             sum(inanimate) as inanimate,
             -- sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )
 
 union all
@@ -301,5 +301,5 @@ union all
         select
             'vehicle_other' as type,
             sum(vehicle_other) as vehicle_other
-        from {{ ref('fact_vehicles') }} vehicles
+        from {{ ref('stg_vehicles') }} vehicles
     )

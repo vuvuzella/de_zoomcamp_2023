@@ -10,7 +10,16 @@ Be able to create an end-to-end data pipeline that involves the following
 4. Create a dashboard that consumes the transformed views of the raw data
 
 ## Data Being Explored
-1. Be able to filter
+1. Total Crashes per vehicle type (Done)
+2. Total Crashes per vehicle type per state (Done)
+3. Total Crashes per state (Done)
+4. Total Casualties, fatalities, major/minor injuries per vehicle type
+5. Total Casualties, fatalities, major/minor injuries per state
+6. Total crashes that involves the following conditions
+    * road conditions
+    * drug/alcohol related
+    * environment conditions
+    * locations
 
 ## Method
 * Batch Processing using Prefect
