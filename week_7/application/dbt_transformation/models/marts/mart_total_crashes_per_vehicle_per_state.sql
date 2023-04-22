@@ -44,4 +44,4 @@ select
         tram
     ) as TOTAL
 from total_vehicles_per_type_per_state t
-where t.state is not null
+where t.state is not null and t.state != 'NZ'
