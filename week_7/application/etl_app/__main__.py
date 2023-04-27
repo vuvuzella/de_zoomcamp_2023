@@ -21,7 +21,9 @@ import json
 from enum import Enum
 from google.cloud import bigquery
 
-BUCKET_NAME = "de-final-project-381710_fp-data-lake"
+PROJECT_ID = "de-final-project-381710"
+BUCKET_NAME = f"{PROJECT_ID}_fp-data-lake"
+BQ_DATASET = "anz_road_crash_dataset"
 
 
 class EXTENSION(Enum):
@@ -93,7 +95,6 @@ def csv_transform(
     files: List[Tuple[str, str, List[bigquery.SchemaField], List[int]]],
     out_dir: Path,
 ):
-
     out_dir.mkdir(parents=True, exist_ok=True)  # make sure output directory exists
 
     for file, table, schema, drop_cols in files:
@@ -121,7 +122,6 @@ def csv_transform(
     # cache_expiration=timedelta(1),  # cache expires after 1 data
 )
 def convert_to_parqet(base_dir: Path, files: List[str], out_dir: Path):
-
     out_dir.mkdir(parents=True, exist_ok=True)  # make sure output directory exists
 
     for file in files:
@@ -313,9 +313,6 @@ def run_anz_road_crash_etl():
         out_dir=parquet_output_path,
     )
 
-    dataset_id = "anz_road_crash_dataset"
-    project_id = "de-final-project-381710"
-
     upload_to_datalake(
         source=parquet_output_path,
         destination=Path("anz_road_crash_data/parquet"),
@@ -326,8 +323,8 @@ def run_anz_road_crash_etl():
     upload_to_data_warehouse(
         base_dir=uri_base_dir,
         file_table_tuples=file_table_tuples,
-        project_id=project_id,
-        dataset_id=dataset_id,
+        project_id=PROJECT_ID,
+        dataset_id=BQ_DATASET,
     )
 
 
